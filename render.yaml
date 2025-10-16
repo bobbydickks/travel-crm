@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: travel-crm
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python create_admin_railway.py && uvicorn src.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        value: travel-crm-super-secret-key-production-2025
+      - key: DATABASE_URL
+        value: sqlite:///./travel_crm.db
+      - key: ENVIRONMENT
+        value: production

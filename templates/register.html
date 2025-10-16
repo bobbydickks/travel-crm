@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация - Travel CRM{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-plus display-4 text-success"></i>
+                        <h2 class="card-title mt-3">Регистрация</h2>
+                        <p class="text-muted">Создайте новый аккаунт</p>
+                    </div>
+
+                    {% if errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <ul class="mb-0 mt-2">
+                                {% for error in errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ email or '' }}" required>
+                            </div>
+                            <div class="form-text">Будет использоваться для входа в систему</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Пароль *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       minlength="6" required>
+                            </div>
+                            <div class="form-text">Минимум 6 символов</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password_confirm" class="form-label">Подтверждение пароля *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-lock-fill"></i>
+                                </span>
+                                <input type="password" class="form-control" id="password_confirm" 
+                                       name="password_confirm" minlength="6" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Роль</label>
+                            <select class="form-select" id="role" name="role">
+                                {% if allowed_roles %}
+                                    {% for allowed_role in allowed_roles %}
+                                        <option value="{{ allowed_role.value }}" {% if role == allowed_role.value %}selected{% endif %}>
+                                            {% if allowed_role.value == 'ADMIN' %}Администратор{% endif %}
+                                            {% if allowed_role.value == 'SUPERVISOR' %}Супервайзер{% endif %}
+                                            {% if allowed_role.value == 'ACCOUNTANT' %}Бухгалтер{% endif %}
+                                            {% if allowed_role.value == 'OPERATOR' %}Оператор{% endif %}
+                                        </option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="OPERATOR">Оператор</option>
+                                {% endif %}
+                            </select>
+                            <div class="form-text">
+                                Роль определяет уровень доступа к функциям системы.
+                                {% if current_user %}
+                                    Вы можете назначать только роли ниже вашей ({{ current_user.role.value }}).
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-person-check"></i> Зарегистрироваться
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            Уже есть аккаунт? <a href="/login" class="text-decoration-none">Войти</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Валидация паролей
+document.addEventListener('DOMContentLoaded', function() {
+    const password = document.getElementById('password');
+    const passwordConfirm = document.getElementById('password_confirm');
+    const form = document.querySelector('form');
+
+    function validatePasswords() {
+        if (password.value !== passwordConfirm.value) {
+            passwordConfirm.setCustomValidity('Пароли не совпадают');
+        } else {
+            passwordConfirm.setCustomValidity('');
+        }
+    }
+
+    password.addEventListener('input', validatePasswords);
+    passwordConfirm.addEventListener('input', validatePasswords);
+
+    // Focus на email при загрузке
+    document.getElementById('email').focus();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Ошибка доступа - Travel CRM{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-danger">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="bi bi-shield-exclamation display-1 text-danger"></i>
+                    </div>
+                    
+                    <h2 class="card-title text-danger mb-3">Доступ запрещён</h2>
+                    
+                    {% if error %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            {{ error }}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-4">
+                            У вас недостаточно прав для выполнения данной операции.
+                        </p>
+                    {% endif %}
+                    
+                    {% if current_user %}
+                        <div class="alert alert-info">
+                            <strong>Ваша роль:</strong> 
+                            {% if current_user.role.value == 'ADMIN' %}Администратор{% endif %}
+                            {% if current_user.role.value == 'SUPERVISOR' %}Супервайзер{% endif %}
+                            {% if current_user.role.value == 'ACCOUNTANT' %}Бухгалтер{% endif %}
+                            {% if current_user.role.value == 'OPERATOR' %}Оператор{% endif %}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="/dashboard" class="btn btn-primary">
+                            <i class="bi bi-house"></i> На главную
+                        </a>
+                        <button onclick="history.back()" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Назад
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            {% if current_user and current_user.role.value in ['ADMIN', 'SUPERVISOR'] %}
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-info-circle"></i> Информация для администраторов
+                        </h5>
+                        <p class="card-text text-muted">
+                            Если вы считаете, что у вас должен быть доступ к этой функции, 
+                            обратитесь к системному администратору для настройки прав доступа.
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,217 @@
+/* Travel CRM Static Assets */
+
+/* Basic reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styling */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Custom primary colors for Travel theme */
+:root {
+    --travel-primary: #0066cc;
+    --travel-primary-dark: #004499;
+    --travel-success: #28a745;
+    --travel-danger: #dc3545;
+    --travel-warning: #ffc107;
+    --travel-info: #17a2b8;
+}
+
+/* Navigation enhancements */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.navbar-brand i {
+    margin-right: 0.5rem;
+    color: #fff;
+}
+
+/* Card enhancements */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    font-weight: 600;
+}
+
+/* Login page styling */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    border: none;
+}
+
+/* Dashboard statistics cards */
+.stats-card {
+    transition: transform 0.2s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+}
+
+.stats-card .card-body {
+    padding: 1.5rem;
+}
+
+.stats-card .display-4 {
+    opacity: 0.8;
+}
+
+/* Timeline for activity */
+.timeline {
+    position: relative;
+    padding-left: 0;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 3rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 1rem;
+    top: 0.5rem;
+    bottom: -2rem;
+    width: 2px;
+    background: #dee2e6;
+}
+
+.timeline-item:last-child::before {
+    display: none;
+}
+
+/* Form styling */
+.form-control:focus {
+    border-color: var(--travel-primary);
+    box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+}
+
+.btn-primary {
+    background-color: var(--travel-primary);
+    border-color: var(--travel-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--travel-primary-dark);
+    border-color: var(--travel-primary-dark);
+}
+
+/* Input groups */
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: #ced4da;
+    color: #6c757d;
+}
+
+/* Custom styles for Swagger UI */
+.swagger-ui .topbar {
+    background-color: var(--travel-primary);
+}
+
+.swagger-ui .topbar .download-url-wrapper .download-url-button {
+    background-color: var(--travel-primary-dark);
+}
+
+/* Health check page styling */
+.health-status {
+    text-align: center;
+    margin-top: 2rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.health-status.healthy {
+    border-left: 4px solid var(--travel-success);
+}
+
+.health-status h1 {
+    color: var(--travel-success);
+    margin-bottom: 1rem;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .stats-card .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Loading states */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Badge styling */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Footer */
+footer {
+    background-color: #f8f9fa !important;
+    border-top: 1px solid #dee2e6;
+    margin-top: auto;
+}
+
+/* Utility classes */
+.text-travel-primary {
+    color: var(--travel-primary) !important;
+}
+
+.bg-travel-primary {
+    background-color: var(--travel-primary) !important;
+}
+
+.border-travel-primary {
+    border-color: var(--travel-primary) !important;
+}

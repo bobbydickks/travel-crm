@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Дашборд - Travel CRM{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">
+                        <i class="bi bi-house text-primary"></i> Добро пожаловать в Travel CRM
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Роль: <span class="badge bg-secondary">{{ current_user.role.value }}</span> | 
+                        Последний вход: <span id="currentTime"></span>
+                    </p>
+                </div>
+                <div class="text-end">
+                    <button class="btn btn-primary" onclick="showQuickActions()">
+                        <i class="bi bi-plus-circle"></i> Быстрые действия
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ stats.clients or 0 }}</h4>
+                            <p class="card-text">Клиентов</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-people display-4"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="/clients" class="text-white text-decoration-none">
+                        <small>Просмотреть всех <i class="bi bi-arrow-right"></i></small>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ stats.applications or 0 }}</h4>
+                            <p class="card-text">Заявок</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-inbox display-4"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="/applications" class="text-white text-decoration-none">
+                        <small>Обработать заявки <i class="bi bi-arrow-right"></i></small>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ stats.orders or 0 }}</h4>
+                            <p class="card-text">Заказов</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-cart display-4"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="/orders" class="text-white text-decoration-none">
+                        <small>Управление заказами <i class="bi bi-arrow-right"></i></small>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ stats.revenue or '0 ₽' }}</h4>
+                            <p class="card-text">Выручка</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-currency-dollar display-4"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="/reports" class="text-white text-decoration-none">
+                        <small>Финансовые отчёты <i class="bi bi-arrow-right"></i></small>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity & Quick Actions -->
+    <div class="row">
+        <!-- Recent Activity -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history"></i> Последняя активность
+                    </h5>
+                    <button class="btn btn-sm btn-outline-primary" onclick="refreshActivity()">
+                        <i class="bi bi-arrow-clockwise"></i> Обновить
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if recent_activity %}
+                        <div class="timeline">
+                            {% for activity in recent_activity %}
+                            <div class="timeline-item mb-3">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <span class="badge bg-{{ activity.type_color }} rounded-circle p-2">
+                                            <i class="bi bi-{{ activity.icon }}"></i>
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-1">{{ activity.title }}</h6>
+                                        <p class="text-muted mb-0">{{ activity.description }}</p>
+                                        <small class="text-muted">{{ activity.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-inbox display-4"></i>
+                            <p class="mt-2">Пока нет активности</p>
+                            <a href="/applications" class="btn btn-primary">
+                                <i class="bi bi-plus"></i> Создать первую заявку
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightning"></i> Быстрые действия
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="/clients/create" class="btn btn-outline-primary">
+                            <i class="bi bi-person-plus"></i> Добавить клиента
+                        </a>
+                        <a href="/applications/create" class="btn btn-outline-success">
+                            <i class="bi bi-inbox-fill"></i> Создать заявку
+                        </a>
+                        <a href="/orders/create" class="btn btn-outline-warning">
+                            <i class="bi bi-cart-plus"></i> Новый заказ
+                        </a>
+                        <hr>
+                        <a href="/import/clients" class="btn btn-outline-info">
+                            <i class="bi bi-upload"></i> Импорт клиентов
+                        </a>
+                        <a href="/reports/export" class="btn btn-outline-secondary">
+                            <i class="bi bi-download"></i> Экспорт данных
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear"></i> Система
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>База данных</span>
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle"></i> OK
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>API сервер</span>
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle"></i> Работает
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Версия</span>
+                        <span class="badge bg-info">v1.0.0</span>
+                    </div>
+                    
+                    <hr>
+                    <div class="text-center">
+                        <a href="/health" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-heart-pulse"></i> Health Check
+                        </a>
+                        <a href="/docs" target="_blank" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-code-slash"></i> API Docs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Обновление времени
+function updateTime() {
+    const now = new Date();
+    document.getElementById('currentTime').textContent = now.toLocaleString('ru-RU');
+}
+
+// Обновление активности
+function refreshActivity() {
+    location.reload();
+}
+
+// Быстрые действия
+function showQuickActions() {
+    // Можно добавить модальное окно с действиями
+    document.querySelector('.col-md-4').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Инициализация
+document.addEventListener('DOMContentLoaded', function() {
+    updateTime();
+    setInterval(updateTime, 60000); // Обновляем каждую минуту
+});
+</script>
+{% endblock %}

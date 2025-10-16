@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Вход - Travel CRM{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-airplane display-4 text-primary"></i>
+                        <h2 class="card-title mt-3">Travel CRM</h2>
+                        <p class="text-muted">Войдите в систему</p>
+                    </div>
+
+                    {% if error %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i> {{ error }}
+                        </div>
+                    {% endif %}
+
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ email or '' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Пароль</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right"></i> Войти
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            Нет аккаунта? <a href="/register" class="text-decoration-none">Зарегистрироваться</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Info -->
+            <div class="text-center mt-4">
+                <small class="text-muted">
+                    <a href="/docs" target="_blank" class="text-decoration-none me-3">
+                        <i class="bi bi-code-slash"></i> API Docs
+                    </a>
+                    <a href="/health" target="_blank" class="text-decoration-none">
+                        <i class="bi bi-heart-pulse"></i> Health Check
+                    </a>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Focus на поле email при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('email').focus();
+});
+
+// Обработка Enter в форме
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.querySelector('form').submit();
+    }
+});
+</script>
+{% endblock %}

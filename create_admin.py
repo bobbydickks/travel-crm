@@ -13,23 +13,31 @@ from src.auth import get_password_hash
 def create_admin_user():
     db = SessionLocal()
     try:
-        # Check if admin already exists
-        admin = db.query(User).filter(User.role == UserRole.ADMIN).first()
+        email = os.getenv("ADMIN_EMAIL", "admin@travelcrm.com")
+        password = os.getenv("ADMIN_PASSWORD", "admin123")
+
+        # Check if admin already exists by role or email
+        admin = db.query(User).filter((User.role == UserRole.ADMIN) | (User.email == email)).first()
         if admin:
-            print("Admin user already exists!")
+            # Ensure admin has ADMIN role and update password if env provided
+            admin.role = UserRole.ADMIN
+            if password:
+                admin.password_hash = get_password_hash(password)
+            db.commit()
+            print(f"Admin user ensured. Email: {admin.email}")
             return
-        
+
         # Create admin user
         admin_user = User(
-            email="admin@travelcrm.com",
-            password_hash=get_password_hash("admin123"),
+            email=email,
+            password_hash=get_password_hash(password),
             role=UserRole.ADMIN
         )
         db.add(admin_user)
         db.commit()
         print("Admin user created successfully!")
-        print("Email: admin@travelcrm.com")
-        print("Password: admin123")
+        print(f"Email: {email}")
+        print(f"Password: {password}")
         
     except Exception as e:
         print(f"Error creating admin user: {e}")

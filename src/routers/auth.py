@@ -3,8 +3,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from ..database import get_db
-from ..models.user import User
-from ..schemas.user import UserCreate, UserResponse, Token
+from ..models.user import User, UserRole
+from ..schemas.user import UserCreate, UserResponse, Token, PublicUserCreate
 from ..auth import verify_password, get_password_hash, create_access_token, create_refresh_token, verify_token
 from ..auth.permissions import (
     get_current_user_with_permissions,
@@ -28,6 +28,19 @@ def create_user(db: Session, user: UserCreate):
         email=user.email,
         password_hash=hashed_password,
         role=user.role
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
+def create_public_user(db: Session, user: PublicUserCreate):
+    hashed_password = get_password_hash(user.password)
+    db_user = User(
+        email=user.email,
+        password_hash=hashed_password,
+        role=UserRole.OPERATOR  # По умолчанию роль оператора для публичной регистрации
     )
     db.add(db_user)
     db.commit()
@@ -63,6 +76,19 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 
+@router.post("/public-register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+def public_register(user: PublicUserCreate, db: Session = Depends(get_db)):
+    """Публичная регистрация нового пользователя с ролью оператора"""
+    
+    db_user = get_user_by_email(db, email=user.email)
+    if db_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    return create_public_user(db=db, user=user)
+
+
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register(
     user: UserCreate, 
@@ -87,7 +113,8 @@ def register(
 
 
 @router.post("/login", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    # Простой асинхронный обработчик: верификация синхронная, но занимает миллисекунды на argon2
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(

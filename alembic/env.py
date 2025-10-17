@@ -17,6 +17,22 @@ from src.models import user  # Import all models
 # access to the values within the .ini file in use.
 config = context.config
 
+# Allow DATABASE_URL from env to override alembic.ini
+db_url = os.getenv("DATABASE_URL")
+if db_url and db_url.startswith("postgres://"):
+    # SQLAlchemy expects postgresql://
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+if db_url:
+    config.set_main_option("sqlalchemy.url", db_url)
+else:
+    # Fallback to application settings if available
+    try:
+        from src.settings import settings as app_settings
+        if app_settings.database_url:
+            config.set_main_option("sqlalchemy.url", app_settings.database_url)
+    except Exception:
+        pass
+
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:

@@ -1,24 +1,38 @@
-FROM python:3.11-slim
+## Base image
+FROM python:3.12-slim
+
+# Prevent Python from writing .pyc files and enable unbuffered logs
+ENV PYTHONDONTWRITEBYTECODE=1 \
+	PYTHONUNBUFFERED=1 \
+	PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
 
-# Устанавливаем системные зависимости
-RUN apt-get update && apt-get install -y \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
+# System deps (git optional, tzdata for correct time, build tools if needed)
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+	   tzdata \
+	&& rm -rf /var/lib/apt/lists/*
 
-# Копируем и устанавливаем Python зависимости
-COPY requirements.txt .
+# Install Python deps first (leverage Docker layer cache)
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем проект
-COPY . .
+# Copy application code
+COPY alembic.ini ./
+COPY alembic ./alembic
+COPY src ./src
+COPY static ./static
+COPY templates ./templates
+COPY docker/entrypoint.sh /entrypoint.sh
 
-# Создаем директории для базы данных
-RUN mkdir -p /app/data
+# Make entrypoint executable
+RUN chmod +x /entrypoint.sh
 
-# Открываем порт
 EXPOSE 8000
 
-# Команда запуска (будет переопределена в railway.json)
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Default envs (can be overridden at runtime)
+ENV PORT=8000
+
+CMD ["/entrypoint.sh"]
+

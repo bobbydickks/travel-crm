@@ -1,44 +1,29 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  api:
+  app:
     build: .
+    container_name: travel-crm-app
+    env_file:
+      - .env
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/travel_crm
-      - MINIO_ENDPOINT=minio:9000
     depends_on:
       - db
-      - minio
-    volumes:
-      - .:/app
-    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
 
   db:
-    image: postgres:15
+    image: postgres:16
+    container_name: travel-crm-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: travel_crm
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-travel_crm}
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
-
-  minio:
-    image: minio/minio:latest
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    environment:
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
-    volumes:
-      - minio_data:/data
-    command: server /data --console-address ":9001"
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
 
 volumes:
-  postgres_data:
-  minio_data:
+  pgdata:

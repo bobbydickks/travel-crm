@@ -9,6 +9,11 @@ class UserCreate(BaseModel):
     role: Optional[UserRole] = UserRole.OPERATOR
 
 
+class PublicUserCreate(BaseModel):
+    email: EmailStr
+    password: str
+
+
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     

@@ -8,9 +8,9 @@ class Settings(BaseSettings):
     
     # Database
     database_url: str
-    postgres_user: str
-    postgres_password: str
-    postgres_db: str
+    postgres_user: str = "dummy"
+    postgres_password: str = "dummy"
+    postgres_db: str = "dummy"
     
     # JWT
     secret_key: str
@@ -19,14 +19,15 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 7
     
     # MinIO
-    minio_endpoint: str
-    minio_access_key: str
-    minio_secret_key: str
-    minio_bucket_name: str
+    minio_endpoint: str = "localhost:9000"
+    minio_access_key: str = "minioadmin"
+    minio_secret_key: str = "minioadmin"
+    minio_bucket_name: str = "files"
     minio_secure: bool = False
     
     # Admin
-    admin_password: str
+    admin_password: str = "admin123"
+    admin_email: str = "admin@test.com"
     
     # Environment
     environment: str = "development"

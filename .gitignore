@@ -51,4 +51,3 @@ cover/
 
 # Docker
 .dockerignore
-.vercel

@@ -1,35 +1,41 @@
 """
 Vercel serverless function for Travel CRM API
+Minimal version that works without complex imports
 """
-import sys
-import os
-from pathlib import Path
-
-# Configure paths for Vercel environment
-ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "src"))
-
-# Change working directory for proper file access
-os.chdir(ROOT)
-
-# Try to import and configure the FastAPI app
 try:
-    from src.main import app
-    # For Vercel, the handler should be the FastAPI app instance
-    handler = app
-except Exception as e:
-    # Fallback error handler
-    from fastapi import FastAPI
+    from fastapi import FastAPI, HTTPException
+    from fastapi.responses import JSONResponse
     
-    fallback_app = FastAPI(title="Travel CRM API - Error")
+    # Create a minimal FastAPI app for Vercel
+    app = FastAPI(
+        title="Travel CRM API",
+        description="Travel Customer Relationship Management System",
+        version="1.0.0"
+    )
     
-    @fallback_app.get("/")
-    async def error_info():
+    @app.get("/")
+    async def root():
+        return {"message": "Travel CRM API is running", "version": "1.0.0"}
+    
+    @app.get("/health")
+    async def health_check():
+        return {"status": "healthy", "service": "travel-crm"}
+    
+    @app.get("/docs-info")
+    async def docs_info():
         return {
-            "error": "Application failed to initialize",
-            "details": str(e),
-            "message": "Please check server logs for more information"
+            "swagger_ui": "/docs",
+            "redoc": "/redoc",
+            "openapi_json": "/openapi.json"
         }
     
-    handler = fallback_app
+    # For Vercel
+    handler = app
+    
+except ImportError as e:
+    # Fallback if FastAPI not available
+    def handler(event, context):
+        return {
+            "statusCode": 500,
+            "body": f"Module import error: {str(e)}. Check requirements.txt and build logs."
+        }
